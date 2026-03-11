@@ -17,7 +17,7 @@ def search_products(
     non_gmo: Optional[bool] = Query(None),
     category: Optional[str] = Query(None, min_length=2, max_length=50),
     limit: int = Query(20, ge=1, le=50),
-    offset: int = Query(0, ge=0),
+    offset: int = Query(0, ge=0, le=1000),
 ) -> List[ProductResponse]:
     q_lower = q.strip().lower()
     category_lower = category.strip().lower() if category else None
