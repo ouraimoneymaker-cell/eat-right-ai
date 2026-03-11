@@ -3,9 +3,11 @@ from __future__ import annotations
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.db.init_db import init_db
 from app.models.schemas import HealthResponse
 from app.routes.analyze import router as analyze_router
 from app.routes.barcode import router as barcode_router
+from app.routes.auth import router as auth_router
 from app.routes.plu import router as plu_router
 from app.routes.search import router as search_router
 
@@ -28,6 +30,11 @@ app.add_middleware(
 )
 
 
+@app.on_event("startup")
+def on_startup() -> None:
+    init_db()
+
+
 @app.get("/", tags=["Root"])
 def root() -> dict:
     return {
@@ -46,3 +53,4 @@ app.include_router(barcode_router)
 app.include_router(plu_router)
 app.include_router(search_router)
 app.include_router(analyze_router)
+app.include_router(auth_router)
