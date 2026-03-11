@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import List
+from typing import Dict, List, Optional
 
 from pydantic import BaseModel
 
@@ -21,6 +21,12 @@ class ProductResponse(BaseModel):
     certifications: List[str]
     origin_country: str
     category: str
+
+
+class ProductSearchResponse(BaseModel):
+    total: int
+    query: str
+    results: List[ProductResponse]
 
 
 class IngredientInsight(BaseModel):
@@ -44,3 +50,35 @@ class PLUResponse(BaseModel):
     organic: bool
     gmo_status: str
     notes: str
+
+
+class ErrorResponse(BaseModel):
+    detail: str
+
+
+class ProductSearchFilters(BaseModel):
+    category: Optional[str] = None
+    organic_only: bool = False
+    non_gmo_only: bool = False
+
+
+class FavoriteRequest(BaseModel):
+    barcode: str
+
+
+class FavoriteResponse(BaseModel):
+    barcode: str
+    created_at: str
+    product: Optional[ProductResponse] = None
+
+
+class LookupEventResponse(BaseModel):
+    event_type: str
+    lookup_value: str
+    metadata_json: Optional[str] = None
+    created_at: str
+
+
+class ReportSummaryResponse(BaseModel):
+    total_events: int
+    by_type: Dict[str, int]

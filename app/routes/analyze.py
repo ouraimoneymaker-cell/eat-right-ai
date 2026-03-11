@@ -4,6 +4,7 @@ from typing import List
 
 from fastapi import APIRouter, HTTPException
 
+from app.db import log_lookup_event
 from app.data.mock_data import INGREDIENT_FACTS, PRODUCTS
 from app.models.schemas import IngredientAnalysisResponse, IngredientInsight
 
@@ -12,7 +13,8 @@ router = APIRouter(prefix="/api/analyze", tags=["Analysis"])
 
 @router.get("/{barcode}", response_model=IngredientAnalysisResponse)
 def analyze_product(barcode: str) -> IngredientAnalysisResponse:
-    product = PRODUCTS.get(barcode)
+    normalized = barcode.strip()
+    product = PRODUCTS.get(normalized)
     if not product:
         raise HTTPException(status_code=404, detail="Barcode not found")
 
@@ -43,6 +45,8 @@ def analyze_product(barcode: str) -> IngredientAnalysisResponse:
 
         if fact["concern_level"] == "high":
             flagged.append(ingredient)
+
+    log_lookup_event("ingredient_analysis", normalized, metadata_json=f"flagged={len(flagged)}")
 
     return IngredientAnalysisResponse(
         product_name=product["name"],
